@@ -1,0 +1,143 @@
+
+```
+# YOLOv5 Object Detection Script
+
+This script performs object detection on an image using a pretrained YOLOv5 model. It includes:
+
+-  Model loading  
+-  Image preprocessing  
+-  Inference with PyTorch  
+-  Non-Max Suppression (NMS)  
+-  Displaying results with bounding boxes  
+
+---
+
+## Required Imports
+
+```
+import torch
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+```
+
+### Libraries Used:
+- `torch`: For loading and running the YOLOv5 model.
+- `cv2` (OpenCV): For image processing and visualization.
+- `numpy`: For numerical operations.
+- `matplotlib.pyplot`: *(Optional – not used in this script, can be removed.)*
+
+### YOLOv5 Utilities Required:
+```
+from utils.general import non_max_suppression
+from utils.augmentations import letterbox
+from utils.torch_utils import select_device
+```
+
+Make sure these utility files are available from the official YOLOv5 repository.
+
+---
+
+## Device Setup
+
+```
+device = select_device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+```
+
+- Automatically selects GPU if available, otherwise uses CPU.
+
+---
+
+## Model Loading
+
+```python
+model = torch.load('yolov5s.pt', map_location=device)['model'].float()
+model.eval()
+```
+
+- Loads the pretrained YOLOv5 model (`yolov5s.pt`)
+- Maps it to the selected device (CPU or GPU)
+- Switches to evaluation mode
+
+---
+
+## Inference Function
+
+```python
+def run_inference(image_path):
+    ...
+```
+
+Performs the following:
+- Reads the image from the specified path
+- Resizes using the `letterbox()` function (keeps aspect ratio, pads as needed)
+- Converts to tensor format:
+  - Rearranges to (C, H, W)
+  - Normalizes pixel values to `[0, 1]`
+  - Adds a batch dimension
+- Runs inference with `torch.no_grad()`
+- Applies Non-Max Suppression to filter overlapping boxes
+
+---
+
+## Displaying Results
+
+```python
+def display_results(image_path, predictions, original_width, original_height, resized_width, resized_height):
+    ...
+```
+
+- Loads the original image for visualization
+- Rescales bounding boxes to original dimensions
+- Filters detections by confidence threshold (≥ 0.45)
+- Draws bounding boxes and labels using OpenCV
+- Displays the result
+
+---
+
+## Run & Visualize
+
+```python
+image_path = '/Users/sileshi/Desktop/data/road.jpg'
+predictions, original_width, original_height, resized_width, resized_height = run_inference(image_path)
+
+if predictions is not None:
+    display_results(image_path, predictions, original_width, original_height, resized_width, resized_height)
+```
+
+---
+
+## Notes
+
+- Ensure `yolov5s.pt` is available in the working directory.
+- Utility files (`utils/general.py`, `utils/augmentations.py`, `utils/torch_utils.py`) are expected to be from the [YOLOv5 official repository](https://github.com/ultralytics/yolov5).
+- To extend this script for video or batch image processing, you can modify the `run_inference` loop accordingly.
+
+---
+
+## Example Output
+
+```
+Using device: cpu
+Bounding Box: (120, 75), (300, 220) - Conf: 0.85, Class: 0
+```
+
+---
+
+## File Structure Suggestion
+
+```
+your_project/
+├── yolov5s.pt
+├── object_detection.py
+├── README.md
+├── utils/
+│   ├── general.py
+│   ├── augmentations.py
+│   └── torch_utils.py
+└── data/
+    └── road.jpg
+```
+
+---
